@@ -7,7 +7,7 @@ export default function App() {
   const [data, setData] = useState(null);
 
   useEffect(() => {
-    axios.get(`${API}/api/portfolio/summary`)
+    axios.get(`${API}/api/portfolio`)
       .then(res => setData(res.data))
       .catch(err => console.error(err));
   }, []);
@@ -20,12 +20,12 @@ export default function App() {
 
       <div>
         <h2>Net Worth</h2>
-        <h1>{data.networth_sgd}</h1>
+        <h1>{data.summary.networth_sgd}</h1>
       </div>
 
       <div>
         <h2>Profit</h2>
-        <h1>{data.profit_sgd}</h1>
+        <h1>{data.summary.profit_sgd}</h1>
       </div>
     </div>
   );
