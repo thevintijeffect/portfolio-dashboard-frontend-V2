@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 
-const API = "https://portfolio-dashboard-backend-4ull.onrender.com/";
+const API = "https://portfolio-dashboard-backend-4ull.onrender.com";
 
 export default function App() {
   const [data, setData] = useState(null);
