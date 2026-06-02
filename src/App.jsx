@@ -1,16 +1,16 @@
-import { useEffect, useState } from "react"
+import {useEffect,useState} from "react"
 import {
 PieChart,
 Pie,
 Cell,
 ResponsiveContainer,
+Tooltip,
 BarChart,
 Bar,
-XAxis,
-Tooltip
+XAxis
 } from "recharts"
 
-const API="YOUR_RENDER_BACKEND_URL"
+const API="YOUR_RENDER_URL"
 
 const COLORS=[
 "#00D4FF",
@@ -23,8 +23,9 @@ const COLORS=[
 export default function App(){
 
 const [loading,setLoading]=useState(true)
-const [portfolio,setPortfolio]=useState(null)
-const [analytics,setAnalytics]=useState(null)
+
+const [portfolio,setPortfolio]=useState({})
+const [analytics,setAnalytics]=useState({})
 
 useEffect(()=>{
 
@@ -33,18 +34,19 @@ async function load(){
 try{
 
 const p=await fetch(`${API}/portfolio`)
-const pdata=await p.json()
+const portfolioData=await p.json()
 
 const a=await fetch(`${API}/analytics`)
-const adata=await a.json()
+const analyticsData=await a.json()
 
-setPortfolio(pdata)
-setAnalytics(adata)
+setPortfolio(portfolioData)
+
+setAnalytics(analyticsData)
 
 }
-catch(err){
+catch(e){
 
-console.log(err)
+console.log(e)
 
 }
 finally{
@@ -59,19 +61,20 @@ load()
 
 },[])
 
+
 if(loading){
 
 return(
 
 <div
 style={{
-background:"#080C12",
 height:"100vh",
+background:"#080C12",
 display:"flex",
 justifyContent:"center",
 alignItems:"center",
 color:"white",
-fontSize:"24px"
+fontSize:"30px"
 }}
 >
 
@@ -83,23 +86,25 @@ Loading Portfolio...
 
 }
 
-const allocationData=Object.entries(
-portfolio.allocation
-).map(([k,v])=>({
-
+const allocation=
+Object.entries(
+portfolio.allocation || {}
+).map(
+([k,v])=>({
 name:k,
 value:v
+})
+)
 
-}))
-
-const countryData=Object.entries(
-analytics.country_exposure
-).map(([k,v])=>({
-
+const countries=
+Object.entries(
+analytics.country_exposure || {}
+).map(
+([k,v])=>({
 country:k,
 value:v
-
-}))
+})
+)
 
 return(
 
@@ -113,42 +118,44 @@ fontFamily:"Arial"
 }}
 >
 
-<h1 style={{fontSize:"40px"}}>
+<h1>
 
 Portfolio Dashboard V2
 
 </h1>
 
+
 <div
 style={{
 display:"grid",
-gridTemplateColumns:"repeat(auto-fit,minmax(250px,1fr))",
+gridTemplateColumns:"repeat(auto-fit,minmax(220px,1fr))",
 gap:"20px",
-marginTop:"30px"
+marginTop:"25px"
 }}
 >
 
 <Card
 title="Net Worth"
-value={`S$ ${portfolio.summary.networth_sgd.toLocaleString()}`}
+value={`S$ ${portfolio.summary?.networth_sgd?.toLocaleString()}`}
 />
 
 <Card
 title="Profit"
-value={`S$ ${portfolio.summary.profit_sgd.toLocaleString()}`}
+value={`S$ ${portfolio.summary?.profit_sgd?.toLocaleString()}`}
 />
 
 <Card
 title="Diversification"
-value={`${analytics.diversification.score}`}
+value={`${analytics.diversification?.score || 0}`}
 />
 
 <Card
-title="Largest Holding"
-value={`${analytics.concentration.largest_holding_pct}%`}
+title="Top5 Concentration"
+value={`${analytics.concentration?.top5_pct || 0}%`}
 />
 
 </div>
+
 
 
 <div
@@ -164,7 +171,7 @@ marginTop:"40px"
 
 <h2>
 
-Asset Allocation
+Allocation
 
 </h2>
 
@@ -176,19 +183,19 @@ height={300}
 <PieChart>
 
 <Pie
-data={allocationData}
+data={allocation}
 dataKey="value"
 outerRadius={110}
 >
 
 {
 
-allocationData.map(
-(entry,index)=>
+allocation.map(
+(x,i)=>
 
 <Cell
-key={index}
-fill={COLORS[index%COLORS.length]}
+key={i}
+fill={COLORS[i%5]}
 />
 
 )
@@ -219,9 +226,7 @@ width="100%"
 height={300}
 >
 
-<BarChart
-data={countryData}
->
+<BarChart data={countries}>
 
 <XAxis dataKey="country"/>
 
@@ -244,7 +249,7 @@ fill="#00D4FF"
 <div
 className="panel"
 style={{
-marginTop:"40px"
+marginTop:"30px"
 }}
 >
 
@@ -254,11 +259,7 @@ Top Holdings
 
 </h2>
 
-<table
-style={{
-width:"100%"
-}}
->
+<table>
 
 <thead>
 
@@ -266,7 +267,7 @@ width:"100%"
 
 <th>Name</th>
 
-<th>Value SGD</th>
+<th>Value</th>
 
 </tr>
 
@@ -276,7 +277,7 @@ width:"100%"
 
 {
 
-portfolio.top_holdings.map(
+portfolio.top_holdings?.map(
 (x,i)=>(
 
 <tr key={i}>
@@ -320,21 +321,23 @@ padding:25px;
 
 border-radius:18px;
 
-border:1px solid #1c2635;
+border:1px solid #1C2635;
 
 }
 
 table{
 
+width:100%;
+
 border-collapse:collapse;
 
 }
 
-th,td{
+td,th{
 
-padding:12px;
+padding:14px;
 
-border-bottom:1px solid #1c2635;
+border-bottom:1px solid #1C2635;
 
 text-align:left;
 
@@ -360,14 +363,13 @@ style={{
 background:"#111820",
 padding:"25px",
 borderRadius:"18px",
-border:"1px solid #1c2635"
+border:"1px solid #1C2635"
 }}
 >
 
 <div
 style={{
-color:"#8CA0B3",
-fontSize:"14px"
+color:"#8492A6"
 }}
 >
 
@@ -377,7 +379,7 @@ fontSize:"14px"
 
 <div
 style={{
-fontSize:"32px",
+fontSize:"30px",
 marginTop:"10px",
 fontWeight:"bold"
 }}
