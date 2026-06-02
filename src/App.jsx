@@ -10,7 +10,7 @@ Bar,
 XAxis
 } from "recharts"
 
-const API="YOUR_RENDER_URL"
+const API="https://portfolio-dashboard-backend-4ull.onrender.com"
 
 const COLORS=[
 "#00D4FF",
