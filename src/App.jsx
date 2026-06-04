@@ -401,6 +401,14 @@ S$
 
 </div>
 
+
+<div
+className="panel"
+style={{
+marginTop:"30px"
+}}
+>
+
 <h2>
 
 Top Holdings
@@ -455,7 +463,6 @@ S$ {x.value_sgd.toLocaleString()}
 </table>
 
 </div>
-
 
 <style>
 
