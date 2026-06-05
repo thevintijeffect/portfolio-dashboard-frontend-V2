@@ -1,5 +1,15 @@
-import {useEffect,useState} from "react"
 import {
+
+useEffect,
+
+useState
+
+}
+
+from "react"
+
+import {
+
 PieChart,
 Pie,
 Cell,
@@ -8,200 +18,150 @@ Tooltip,
 BarChart,
 Bar,
 XAxis
-} from "recharts"
+
+}
+
+from "recharts"
 
 const API="https://portfolio-dashboard-backend-4ull.onrender.com"
 
 const COLORS=[
+
 "#00D4FF",
 "#00E5A0",
 "#FFB830",
-"#8B5CF6",
-"#FF4D6A"
+"#8B5CF6"
+
 ]
 
 export default function App(){
 
-const [loading,setLoading]=useState(true)
-
 const [portfolio,setPortfolio]=useState({})
-const [analytics,setAnalytics]=useState({})
+
+const [selected,setSelected]=useState(null)
 
 useEffect(()=>{
 
-async function load(){
+fetch(`${API}/portfolio`)
 
-try{
+.then(
 
-const p=await fetch(`${API}/portfolio`)
-const portfolioData=await p.json()
+r=>r.json()
 
-const a=await fetch(`${API}/analytics`)
-const analyticsData=await a.json()
+)
 
-setPortfolio(portfolioData)
+.then(
 
-setAnalytics(analyticsData)
+setPortfolio
 
-}
-catch(e){
-
-console.log(e)
-
-}
-finally{
-
-setLoading(false)
-
-}
-
-}
-
-load()
+)
 
 },[])
 
+if(!portfolio.summary){
 
-if(loading){
-
-return(
-
-<div
-style={{
-height:"100vh",
-background:"#080C12",
-display:"flex",
-justifyContent:"center",
-alignItems:"center",
-color:"white",
-fontSize:"30px"
-}}
->
-
-Loading Portfolio...
-
-</div>
-
-)
+return <div>Loading...</div>
 
 }
 
 const allocation=
+
 Object.entries(
+
 portfolio.allocation || {}
+
 ).map(
+
 ([k,v])=>({
+
 name:k,
+
 value:v
+
 })
+
 )
 
-const countries=
-Object.entries(
-analytics.country_exposure || {}
-).map(
-([k,v])=>({
-country:k,
-value:v
-})
+const holdings=
+
+selected
+
+?
+
+portfolio.holdings.filter(
+
+x=>x.sub_type===selected
+
 )
 
-const assetBreakdown =
+:
 
-portfolio.asset_class_breakdown || []
-  
+[]
+
+const grouped={}
+
+holdings.forEach(h=>{
+
+if(!grouped[h.currency])
+
+grouped[h.currency]=[]
+
+grouped[h.currency].push(h)
+
+})
+
 return(
 
-<div
-style={{
+<div style={{
+
 background:"#080C12",
-minHeight:"100vh",
-padding:"30px",
+
 color:"white",
-fontFamily:"Arial",
-maxWidth:"1500px",
-margin:"auto"
-}}
->
+
+padding:"30px",
+
+minHeight:"100vh"
+
+}}>
 
 <h1>
 
-Portfolio Dashboard V2
+Portfolio Dashboard
 
 </h1>
 
-
-<div
-style={{
-display:"grid",
-gridTemplateColumns:"repeat(auto-fit,minmax(220px,1fr))",
-gap:"20px",
-marginTop:"25px"
-}}
->
-
-<Card
-title="Net Worth"
-value={`S$ ${portfolio.summary?.networth_sgd?.toLocaleString()}`}
-/>
-
-<Card
-title="Profit"
-value={`S$ ${portfolio.summary?.profit_sgd?.toLocaleString()}`}
-/>
-
-<Card
-title="Diversification"
-value={`${analytics.diversification?.score || 0}`}
-/>
-
-<Card
-title="Top5 Concentration"
-value={`${analytics.concentration?.top5_pct || 0}%`}
-/>
-
-</div>
-
-
-
-<div
-style={{
-display:"grid",
-gridTemplateColumns:"1fr 1fr",
-gap:"30px",
-marginTop:"40px"
-}}
->
-
-<div className="panel">
-
-<h2>
-
-Allocation
-
-</h2>
-
 <ResponsiveContainer
+
 width="100%"
+
 height={300}
+
 >
 
 <PieChart>
 
 <Pie
+
 data={allocation}
+
 dataKey="value"
-outerRadius={110}
+
+outerRadius={100}
+
 >
 
 {
 
 allocation.map(
+
 (x,i)=>
 
 <Cell
+
+fill={COLORS[i%4]}
+
 key={i}
-fill={COLORS[i%5]}
+
 />
 
 )
@@ -210,101 +170,15 @@ fill={COLORS[i%5]}
 
 </Pie>
 
-<Tooltip/>
-
 </PieChart>
 
 </ResponsiveContainer>
 
-</div>
-
-
-<div className="panel">
-
 <h2>
 
-Country Exposure
+Asset Classes
 
 </h2>
-
-<ResponsiveContainer
-width="100%"
-height={300}
->
-
-<BarChart data={countries}>
-
-<XAxis dataKey="country"/>
-
-<Tooltip/>
-
-<Bar
-dataKey="value"
-fill="#00D4FF"
-/>
-
-</BarChart>
-
-</ResponsiveContainer>
-
-</div>
-
-</div>
-
-
-<div
-className="panel"
-style={{
-marginTop:"30px"
-}}
->
-
-<h2>
-
-Asset Class Breakdown
-
-</h2>
-
-{
-
-assetBreakdown.map(
-
-(asset,index)=>(
-
-<div
-
-key={index}
-
-style={{
-
-marginBottom:"35px",
-
-paddingBottom:"25px",
-
-borderBottom:"1px solid #1C2635"
-
-}}
-
->
-
-<h3>
-
-{asset.asset_class}
-
-—
-
-S$
-
-{asset.total_value_sgd.toLocaleString()}
-
-(
-
-{asset.percentage}%
-
-)
-
-</h3>
-
 
 <table>
 
@@ -314,19 +188,19 @@ S$
 
 <th>
 
-Holding
+Asset Class
 
 </th>
 
 <th>
 
-Currency
+Investment
 
 </th>
 
 <th>
 
-Value
+Current
 
 </th>
 
@@ -336,117 +210,75 @@ Profit
 
 </th>
 
+<th>
+
+Profit %
+
+</th>
+
 </tr>
 
 </thead>
-
 
 <tbody>
 
 {
 
-asset.holdings.map(
+portfolio.asset_summary?.map(
 
-(h,i)=>(
+(row,i)=>(
 
-<tr key={i}>
+<tr
 
-<td>
+key={i}
 
-{h.asset}
+onClick={()=>setSelected(
 
-</td>
+row.sub_type
 
-<td>
+)}
 
-{h.currency}
-
-</td>
-
-<td>
-
-S$
-
-{h.value_sgd.toLocaleString()}
-
-</td>
-
-<td>
-
-S$
-
-{h.profit_sgd.toLocaleString()}
-
-</td>
-
-</tr>
-
-)
-
-)
-
-}
-
-</tbody>
-
-</table> 
-
-</div>
-
-)
-
-)
-
-}
-
-</div>
-
-
-<div
-className="panel"
 style={{
-marginTop:"30px"
+
+cursor:"pointer"
+
 }}
+
 >
 
-<h2>
-
-Top Holdings
-
-</h2>
-
-<table>
-
-<thead>
-
-<tr>
-
-<th>Name</th>
-
-<th>Value</th>
-
-</tr>
-
-</thead>
-
-<tbody>
-
-{
-
-portfolio.top_holdings?.map(
-(x,i)=>(
-
-<tr key={i}>
-
 <td>
 
-{x.asset}
+{row.sub_type}
 
 </td>
 
 <td>
 
-S$ {x.value_sgd.toLocaleString()}
+S$
+
+{row.investment_sgd.toLocaleString()}
+
+</td>
+
+<td>
+
+S$
+
+{row.value_sgd.toLocaleString()}
+
+</td>
+
+<td>
+
+S$
+
+{row.profit_sgd.toLocaleString()}
+
+</td>
+
+<td>
+
+{row.profit_pct.toFixed(2)}%
 
 </td>
 
@@ -462,45 +294,193 @@ S$ {x.value_sgd.toLocaleString()}
 
 </table>
 
-</div>
 
-<style>
+{
 
-{`
+selected &&
 
-.panel{
+<div>
 
-background:#111820;
+<h2>
 
-padding:25px;
+{selected}
 
-border-radius:18px;
+Holdings
 
-border:1px solid #1C2635;
+</h2>
+
+
+{
+
+Object.entries(
+
+grouped
+
+).map(
+
+([currency,list])=>{
+
+const totalValue=
+
+list.reduce(
+
+(a,b)=>a+b.market_value,
+
+0
+
+)
+
+const totalInv=
+
+list.reduce(
+
+(a,b)=>a+b.investment_value,
+
+0
+
+)
+
+const totalSGD=
+
+list.reduce(
+
+(a,b)=>a+b.value_sgd,
+
+0
+
+)
+
+return(
+
+<div key={currency}>
+
+<h3>
+
+{currency}
+
+</h3>
+
+<table>
+
+<thead>
+
+<tr>
+
+<th>Name</th>
+
+<th>Qty</th>
+
+<th>Price</th>
+
+<th>Market</th>
+
+<th>Inv Price</th>
+
+<th>Investment</th>
+
+<th>Gain%</th>
+
+<th>Gain</th>
+
+</tr>
+
+</thead>
+
+<tbody>
+
+{
+
+list.map(
+
+(h,i)=>(
+
+<tr key={i}>
+
+<td>{h.asset}</td>
+
+<td>{h.qty}</td>
+
+<td>{h.current_price}</td>
+
+<td>{h.market_value}</td>
+
+<td>{h.investment_price}</td>
+
+<td>{h.investment_value}</td>
+
+<td>{h.profit_pct.toFixed(2)}%</td>
+
+<td>{(h.market_value-h.investment_value).toFixed(2)}</td>
+
+</tr>
+
+)
+
+)
 
 }
 
-table{
+<tr>
 
-width:100%;
+<td>
 
-border-collapse:collapse;
+TOTAL
 
-}
+</td>
 
-td,th{
+<td/>
 
-padding:14px;
+<td/>
 
-border-bottom:1px solid #1C2635;
+<td>
 
-text-align:left;
+{totalValue.toFixed(2)}
 
-}
+</td>
 
-`}
+<td/>
 
-</style>
+<td>
+
+{totalInv.toFixed(2)}
+
+</td>
+
+<td/>
+
+<td>
+
+{(totalValue-totalInv).toFixed(2)}
+
+</td>
+
+</tr>
+
+<tr>
+
+<td>
+
+TOTAL SGD
+
+</td>
+
+<td/>
+
+<td/>
+
+<td>
+
+S$
+
+{totalSGD.toFixed(2)}
+
+</td>
+
+</tr>
+
+</tbody>
+
+</table>
 
 </div>
 
@@ -508,41 +488,13 @@ text-align:left;
 
 }
 
+)
 
-function Card({title,value}){
-
-return(
-
-<div
-style={{
-background:"#111820",
-padding:"25px",
-borderRadius:"18px",
-border:"1px solid #1C2635"
-}}
->
-
-<div
-style={{
-color:"#8492A6"
-}}
->
-
-{title}
+}
 
 </div>
 
-<div
-style={{
-fontSize:"30px",
-marginTop:"10px",
-fontWeight:"bold"
-}}
->
-
-{value}
-
-</div>
+}
 
 </div>
 
