@@ -1,15 +1,6 @@
-import {
-
-useEffect,
-
-useState
-
-}
-
-from "react"
+import { useEffect, useState } from "react"
 
 import {
-
 PieChart,
 Pie,
 Cell,
@@ -18,7 +9,6 @@ Tooltip,
 BarChart,
 Bar,
 XAxis
-
 }
 
 from "recharts"
@@ -30,11 +20,14 @@ const COLORS=[
 "#00D4FF",
 "#00E5A0",
 "#FFB830",
-"#8B5CF6"
+"#8B5CF6",
+"#FF4D6A"
 
 ]
 
 export default function App(){
+
+const [loading,setLoading]=useState(true)
 
 const [portfolio,setPortfolio]=useState({})
 
@@ -42,25 +35,75 @@ const [selected,setSelected]=useState(null)
 
 useEffect(()=>{
 
-fetch(`${API}/portfolio`)
+async function load(){
 
-.then(
+try{
 
-r=>r.json()
+const res=
 
-)
+await fetch(
 
-.then(
-
-setPortfolio
+`${API}/portfolio`
 
 )
+
+const data=
+
+await res.json()
+
+setPortfolio(data)
+
+}
+
+catch(err){
+
+console.log(err)
+
+}
+
+finally{
+
+setLoading(false)
+
+}
+
+}
+
+load()
 
 },[])
 
-if(!portfolio.summary){
+if(
 
-return <div>Loading...</div>
+loading ||
+
+!portfolio.summary
+
+){
+
+return(
+
+<div style={{
+
+height:"100vh",
+
+display:"flex",
+
+justifyContent:"center",
+
+alignItems:"center",
+
+background:"#080C12",
+
+color:"white"
+
+}}>
+
+Loading Portfolio...
+
+</div>
+
+)
 
 }
 
@@ -82,13 +125,31 @@ value:v
 
 )
 
+const countries=
+
+Object.entries(
+
+portfolio.currency_exposure || {}
+
+).map(
+
+([k,v])=>({
+
+country:k,
+
+value:v
+
+})
+
+)
+
 const holdings=
 
 selected
 
 ?
 
-portfolio.holdings.filter(
+(portfolio.holdings || []).filter(
 
 x=>x.sub_type===selected
 
@@ -102,9 +163,15 @@ const grouped={}
 
 holdings.forEach(h=>{
 
-if(!grouped[h.currency])
+if(
+
+!grouped[h.currency]
+
+){
 
 grouped[h.currency]=[]
+
+}
 
 grouped[h.currency].push(h)
 
@@ -116,11 +183,17 @@ return(
 
 background:"#080C12",
 
-color:"white",
+minHeight:"100vh",
 
 padding:"30px",
 
-minHeight:"100vh"
+fontFamily:"Arial",
+
+color:"white",
+
+maxWidth:"1500px",
+
+margin:"auto"
 
 }}>
 
@@ -129,6 +202,84 @@ minHeight:"100vh"
 Portfolio Dashboard
 
 </h1>
+
+
+<div style={{
+
+display:"grid",
+
+gridTemplateColumns:
+
+"repeat(auto-fit,minmax(220px,1fr))",
+
+gap:"20px",
+
+marginTop:"25px"
+
+}}>
+
+<Card
+
+title="Net Worth"
+
+value={`S$ ${portfolio.summary.networth_sgd.toLocaleString()}`}
+
+/>
+
+<Card
+
+title="Profit"
+
+value={`S$ ${portfolio.summary.profit_sgd.toLocaleString()}`}
+
+/>
+
+<Card
+
+title="Asset Classes"
+
+value={
+
+portfolio.asset_class_breakdown?.length || 0
+
+}
+
+/>
+
+<Card
+
+title="Holdings"
+
+value={
+
+portfolio.holdings?.length || 0
+
+}
+
+/>
+
+</div>
+
+
+<div style={{
+
+display:"grid",
+
+gridTemplateColumns:"1fr 1fr",
+
+gap:"30px",
+
+marginTop:"40px"
+
+}}>
+
+<div className="panel">
+
+<h2>
+
+Allocation
+
+</h2>
 
 <ResponsiveContainer
 
@@ -140,13 +291,15 @@ height={300}
 
 <PieChart>
 
+<Tooltip/>
+
 <Pie
 
 data={allocation}
 
 dataKey="value"
 
-outerRadius={100}
+outerRadius={110}
 
 >
 
@@ -158,9 +311,9 @@ allocation.map(
 
 <Cell
 
-fill={COLORS[i%4]}
-
 key={i}
+
+fill={COLORS[i%5]}
 
 />
 
@@ -173,6 +326,68 @@ key={i}
 </PieChart>
 
 </ResponsiveContainer>
+
+</div>
+
+
+<div className="panel">
+
+<h2>
+
+Currency Exposure
+
+</h2>
+
+<ResponsiveContainer
+
+width="100%"
+
+height={300}
+
+>
+
+<BarChart
+
+data={countries}
+
+>
+
+<XAxis
+
+dataKey="country"
+
+/>
+
+<Tooltip/>
+
+<Bar
+
+dataKey="value"
+
+fill="#00D4FF"
+
+/>
+
+</BarChart>
+
+</ResponsiveContainer>
+
+</div>
+
+</div>
+
+
+<div
+
+className="panel"
+
+style={{
+
+marginTop:"30px"
+
+}}
+
+>
 
 <h2>
 
@@ -194,25 +409,13 @@ Asset Class
 
 <th>
 
-Investment
+Current Value
 
 </th>
 
 <th>
 
-Current
-
-</th>
-
-<th>
-
-Profit
-
-</th>
-
-<th>
-
-Profit %
+Portfolio %
 
 </th>
 
@@ -224,7 +427,7 @@ Profit %
 
 {
 
-portfolio.asset_summary?.map(
+portfolio.asset_class_breakdown?.map(
 
 (row,i)=>(
 
@@ -232,11 +435,15 @@ portfolio.asset_summary?.map(
 
 key={i}
 
-onClick={()=>setSelected(
+onClick={()=>
 
-row.sub_type
+setSelected(
 
-)}
+row.asset_class
+
+)
+
+}
 
 style={{
 
@@ -248,7 +455,7 @@ cursor:"pointer"
 
 <td>
 
-{row.sub_type}
+{row.asset_class}
 
 </td>
 
@@ -256,29 +463,13 @@ cursor:"pointer"
 
 S$
 
-{row.investment_sgd.toLocaleString()}
+{row.total_value_sgd.toLocaleString()}
 
 </td>
 
 <td>
 
-S$
-
-{row.value_sgd.toLocaleString()}
-
-</td>
-
-<td>
-
-S$
-
-{row.profit_sgd.toLocaleString()}
-
-</td>
-
-<td>
-
-{row.profit_pct.toFixed(2)}%
+{row.percentage}%
 
 </td>
 
@@ -294,12 +485,24 @@ S$
 
 </table>
 
+</div>
+
 
 {
 
 selected &&
 
-<div>
+<div
+
+className="panel"
+
+style={{
+
+marginTop:"30px"
+
+}}
+
+>
 
 <h2>
 
@@ -308,7 +511,6 @@ selected &&
 Holdings
 
 </h2>
-
 
 {
 
@@ -324,27 +526,17 @@ const totalValue=
 
 list.reduce(
 
-(a,b)=>a+b.market_value,
-
-0
-
-)
-
-const totalInv=
-
-list.reduce(
-
-(a,b)=>a+b.investment_value,
-
-0
-
-)
-
-const totalSGD=
-
-list.reduce(
-
 (a,b)=>a+b.value_sgd,
+
+0
+
+)
+
+const totalProfit=
+
+list.reduce(
+
+(a,b)=>a+b.profit_sgd,
 
 0
 
@@ -352,11 +544,23 @@ list.reduce(
 
 return(
 
-<div key={currency}>
+<div
+
+key={currency}
+
+style={{
+
+marginBottom:"40px"
+
+}}
+
+>
 
 <h3>
 
 {currency}
+
+Holdings
 
 </h3>
 
@@ -368,19 +572,9 @@ return(
 
 <th>Name</th>
 
-<th>Qty</th>
+<th>Value SGD</th>
 
-<th>Price</th>
-
-<th>Market</th>
-
-<th>Inv Price</th>
-
-<th>Investment</th>
-
-<th>Gain%</th>
-
-<th>Gain</th>
+<th>Profit SGD</th>
 
 </tr>
 
@@ -396,21 +590,27 @@ list.map(
 
 <tr key={i}>
 
-<td>{h.asset}</td>
+<td>
 
-<td>{h.qty}</td>
+{h.asset}
 
-<td>{h.current_price}</td>
+</td>
 
-<td>{h.market_value}</td>
+<td>
 
-<td>{h.investment_price}</td>
+S$
 
-<td>{h.investment_value}</td>
+{h.value_sgd.toLocaleString()}
 
-<td>{h.profit_pct.toFixed(2)}%</td>
+</td>
 
-<td>{(h.market_value-h.investment_value).toFixed(2)}</td>
+<td>
+
+S$
+
+{h.profit_sgd.toLocaleString()}
+
+</td>
 
 </tr>
 
@@ -428,51 +628,19 @@ TOTAL
 
 </td>
 
-<td/>
-
-<td/>
-
 <td>
 
-{totalValue.toFixed(2)}
+S$
+
+{totalValue.toLocaleString()}
 
 </td>
-
-<td/>
-
-<td>
-
-{totalInv.toFixed(2)}
-
-</td>
-
-<td/>
-
-<td>
-
-{(totalValue-totalInv).toFixed(2)}
-
-</td>
-
-</tr>
-
-<tr>
-
-<td>
-
-TOTAL SGD
-
-</td>
-
-<td/>
-
-<td/>
 
 <td>
 
 S$
 
-{totalSGD.toFixed(2)}
+{totalProfit.toLocaleString()}
 
 </td>
 
@@ -495,6 +663,103 @@ S$
 </div>
 
 }
+
+
+<style>
+
+{`
+
+.panel{
+
+background:#111820;
+
+padding:25px;
+
+border-radius:18px;
+
+border:1px solid #1C2635;
+
+}
+
+table{
+
+width:100%;
+
+border-collapse:collapse;
+
+}
+
+td,th{
+
+padding:14px;
+
+border-bottom:1px solid #1C2635;
+
+text-align:left;
+
+}
+
+tr:hover{
+
+background:#16212F;
+
+}
+
+`}
+
+</style>
+
+</div>
+
+)
+
+}
+
+function Card({
+
+title,
+
+value
+
+}){
+
+return(
+
+<div style={{
+
+background:"#111820",
+
+padding:"25px",
+
+borderRadius:"18px",
+
+border:"1px solid #1C2635"
+
+}}>
+
+<div style={{
+
+color:"#7F8A9B"
+
+}}>
+
+{title}
+
+</div>
+
+<div style={{
+
+fontSize:"30px",
+
+marginTop:"10px",
+
+fontWeight:"bold"
+
+}}>
+
+{value}
+
+</div>
 
 </div>
 
