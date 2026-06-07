@@ -401,23 +401,17 @@ Asset Classes
 
 <tr>
 
-<th>
+<th>Asset Class</th>
 
-Asset Class
+<th>Invested</th>
 
-</th>
+<th>Current</th>
 
-<th>
+<th>Profit</th>
 
-Current Value
+<th>Profit %</th>
 
-</th>
-
-<th>
-
-Portfolio %
-
-</th>
+<th>Portfolio %</th>
 
 </tr>
 
@@ -435,15 +429,11 @@ portfolio.asset_class_breakdown?.map(
 
 key={i}
 
-onClick={()=>
-
-setSelected(
+onClick={()=>setSelected(
 
 row.asset_class
 
-)
-
-}
+)}
 
 style={{
 
@@ -463,13 +453,35 @@ cursor:"pointer"
 
 S$
 
-{row.total_value_sgd.toLocaleString()}
+{row.investment_sgd.toLocaleString()}
 
 </td>
 
 <td>
 
-{row.percentage}%
+S$
+
+{row.value_sgd.toLocaleString()}
+
+</td>
+
+<td>
+
+S$
+
+{row.profit_sgd.toLocaleString()}
+
+</td>
+
+<td>
+
+{row.profit_pct}%
+
+</td>
+
+<td>
+
+{row.portfolio_pct}%
 
 </td>
 
@@ -522,11 +534,71 @@ grouped
 
 ([currency,list])=>{
 
-const totalValue=
+const totalMarket=
+
+list.reduce(
+
+(a,b)=>a+b.market_value,
+
+0
+
+)
+
+const totalInvestment=
+
+list.reduce(
+
+(a,b)=>a+b.investment_value,
+
+0
+
+)
+
+const totalGain=
+
+list.reduce(
+
+(a,b)=>a+b.unrealised_gain,
+
+0
+
+)
+
+const totalPortfolio=
+
+list.reduce(
+
+(a,b)=>a+b.portfolio_pct,
+
+0
+
+)
+
+const totalMarketSGD=
 
 list.reduce(
 
 (a,b)=>a+b.value_sgd,
+
+0
+
+)
+
+const totalInvestmentSGD=
+
+list.reduce(
+
+(a,b)=>a+b.investment_sgd,
+
+0
+
+)
+
+const totalGainSGD=
+
+list.reduce(
+
+(a,b)=>a+b.profit_sgd,
 
 0
 
@@ -572,9 +644,19 @@ Holdings
 
 <th>Name</th>
 
-<th>Value SGD</th>
+<th>Qty</th>
 
-<th>Profit SGD</th>
+<th>Price</th>
+
+<th>Market Value</th>
+
+<th>Investment</th>
+
+<th>Gain</th>
+
+<th>Gain%</th>
+
+<th>Portfolio%</th>
 
 </tr>
 
@@ -598,17 +680,43 @@ list.map(
 
 <td>
 
-S$
-
-{h.value_sgd.toLocaleString()}
+{h.qty}
 
 </td>
 
 <td>
 
-S$
+{h.current_price}
 
-{h.profit_sgd.toLocaleString()}
+</td>
+
+<td>
+
+{h.market_value.toLocaleString()}
+
+</td>
+
+<td>
+
+{h.investment_value.toLocaleString()}
+
+</td>
+
+<td>
+
+{h.unrealised_gain.toLocaleString()}
+
+</td>
+
+<td>
+
+{h.unrealised_gain_pct.toFixed(2)}%
+
+</td>
+
+<td>
+
+{h.portfolio_pct.toFixed(2)}%
 
 </td>
 
@@ -628,11 +736,56 @@ TOTAL
 
 </td>
 
+<td/>
+
+<td/>
+
+<td>
+
+{totalMarket.toLocaleString()}
+
+</td>
+
+<td>
+
+{totalInvestment.toLocaleString()}
+
+</td>
+
+<td>
+
+{totalGain.toLocaleString()}
+
+</td>
+
+<td/>
+
+<td>
+
+{totalPortfolio.toFixed(2)}%
+
+</td>
+
+</tr>
+
+
+<tr>
+
+<td>
+
+TOTAL SGD
+
+</td>
+
+<td/>
+
+<td/>
+
 <td>
 
 S$
 
-{totalValue.toLocaleString()}
+{totalMarketSGD.toLocaleString()}
 
 </td>
 
@@ -640,7 +793,23 @@ S$
 
 S$
 
-{totalProfit.toLocaleString()}
+{totalInvestmentSGD.toLocaleString()}
+
+</td>
+
+<td>
+
+S$
+
+{totalGainSGD.toLocaleString()}
+
+</td>
+
+<td/>
+
+<td>
+
+{totalPortfolio.toFixed(2)}%
 
 </td>
 
