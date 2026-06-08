@@ -143,15 +143,19 @@ value:v
 
 )
 
-const holdings=
+const holdings =
 
-selected
+selected && portfolio.holdings
 
 ?
 
-(portfolio.holdings || []).filter(
+portfolio.holdings.filter(
 
-x=>x.sub_type===selected
+h => String(h.sub_type).trim()
+
+===
+
+String(selected).trim()
 
 )
 
@@ -159,21 +163,19 @@ x=>x.sub_type===selected
 
 []
 
-const grouped={}
+const grouped = {}
 
 holdings.forEach(h=>{
 
-if(
+const curr = h.currency || "Unknown"
 
-!grouped[h.currency]
+if(!grouped[curr]){
 
-){
-
-grouped[h.currency]=[]
+grouped[curr]=[]
 
 }
 
-grouped[h.currency].push(h)
+grouped[curr].push(h)
 
 })
 
