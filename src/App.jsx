@@ -546,7 +546,67 @@ const totalMarket=
 
 list.reduce(
 
-(a,b)=>a+b.market_value,
+(a,b)=>a+(b.market_value || 0),
+
+0
+
+)
+
+const totalInvestment=
+
+list.reduce(
+
+(a,b)=>a+(b.investment_value || 0),
+
+0
+
+)
+
+const totalGain=
+
+list.reduce(
+
+(a,b)=>a+(b.unrealised_gain || 0),
+
+0
+
+)
+
+const totalPortfolio=
+
+list.reduce(
+
+(a,b)=>a+(b.portfolio_pct || 0),
+
+0
+
+)
+
+const totalMarketSGD=
+
+list.reduce(
+
+(a,b)=>a+(b.value_sgd || 0),
+
+0
+
+)
+
+const totalInvestmentSGD=
+
+list.reduce(
+
+(a,b)=>a+(b.investment_sgd || 0),
+
+0
+
+)
+
+const totalGainSGD=
+
+list.reduce(
+
+(a,b)=>a+(b.profit_sgd || 0),
 
 0
 
@@ -682,49 +742,49 @@ list.map(
 
 <td>
 
-{h.asset}
+{h.asset || "-"}
 
 </td>
 
 <td>
 
-{h.qty}
+{(h.qty ?? 0).toLocaleString()}
 
 </td>
 
 <td>
 
-{h.current_price}
+{(h.current_price ?? 0).toLocaleString()}
 
 </td>
 
 <td>
 
-{h.market_value.toLocaleString()}
+{(h.market_value ?? 0).toLocaleString()}
 
 </td>
 
 <td>
 
-{h.investment_value.toLocaleString()}
+{(h.investment_value ?? 0).toLocaleString()}
 
 </td>
 
 <td>
 
-{h.unrealised_gain.toLocaleString()}
+{(h.unrealised_gain ?? 0).toLocaleString()}
 
 </td>
 
 <td>
 
-{h.unrealised_gain_pct.toFixed(2)}%
+{(h.unrealised_gain_pct ?? 0).toFixed(2)}%
 
 </td>
 
 <td>
 
-{h.portfolio_pct.toFixed(2)}%
+{(h.portfolio_pct ?? 0).toFixed(2)}%
 
 </td>
 
