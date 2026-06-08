@@ -145,17 +145,15 @@ value:v
 
 const holdings =
 
-console.log(selected)
-
-console.log(holdings)
-  
-selected && portfolio.holdings
+selected && Array.isArray(portfolio.holdings)
 
 ?
 
 portfolio.holdings.filter(
 
-h => String(h.sub_type).trim()
+h =>
+
+String(h.sub_type).trim()
 
 ===
 
@@ -168,6 +166,8 @@ String(selected).trim()
 []
 
 const grouped = {}
+
+if(Array.isArray(holdings)){
 
 holdings.forEach(h=>{
 
@@ -182,6 +182,8 @@ grouped[curr]=[]
 grouped[curr].push(h)
 
 })
+
+}
 
 return(
 
