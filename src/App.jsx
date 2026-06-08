@@ -600,9 +600,7 @@ return(
 
 <h3>
 
-{currency}
-
- Holdings
+{currency} Holdings
 
 </h3>
 
