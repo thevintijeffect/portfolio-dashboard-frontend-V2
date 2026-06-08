@@ -542,7 +542,7 @@ grouped
 
 ([currency,list])=>{
 
-const totalMarket=
+const totalMarket =
 
 list.reduce(
 
@@ -552,7 +552,7 @@ list.reduce(
 
 )
 
-const totalInvestment=
+const totalInvestment =
 
 list.reduce(
 
@@ -562,7 +562,7 @@ list.reduce(
 
 )
 
-const totalGain=
+const totalGain =
 
 list.reduce(
 
@@ -572,7 +572,7 @@ list.reduce(
 
 )
 
-const totalPortfolio=
+const totalPortfolio =
 
 list.reduce(
 
@@ -582,7 +582,7 @@ list.reduce(
 
 )
 
-const totalMarketSGD=
+const totalMarketSGD =
 
 list.reduce(
 
@@ -592,7 +592,7 @@ list.reduce(
 
 )
 
-const totalInvestmentSGD=
+const totalInvestmentSGD =
 
 list.reduce(
 
@@ -602,7 +602,7 @@ list.reduce(
 
 )
 
-const totalGainSGD=
+const totalGainSGD =
 
 list.reduce(
 
