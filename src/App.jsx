@@ -602,7 +602,7 @@ return(
 
 {currency}
 
-Holdings
+ Holdings
 
 </h3>
 
