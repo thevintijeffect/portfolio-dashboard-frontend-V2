@@ -526,9 +526,7 @@ marginTop:"30px"
 
 <h2>
 
-{selected}
-
-Holdings
+{selected} Holdings
 
 </h2>
 
