@@ -145,6 +145,10 @@ value:v
 
 const holdings =
 
+console.log(selected)
+
+console.log(holdings)
+  
 selected && portfolio.holdings
 
 ?
