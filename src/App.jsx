@@ -534,149 +534,61 @@ Holdings
 
 {
 
-Object.entries(
-
-grouped
-
-).map(
+Object.entries(grouped).map(
 
 ([currency,list])=>{
 
-const totalMarket =
+const totalMarket = list.reduce(
 
-list.reduce(
-
-(a,b)=>a+(b.market_value || 0),
+(a,b)=>a + (b.market_value || 0),
 
 0
 
 )
 
-const totalInvestment =
+const totalInvestment = list.reduce(
 
-list.reduce(
-
-(a,b)=>a+(b.investment_value || 0),
+(a,b)=>a + (b.investment_value || 0),
 
 0
 
 )
 
-const totalGain =
+const totalGain = list.reduce(
 
-list.reduce(
-
-(a,b)=>a+(b.unrealised_gain || 0),
+(a,b)=>a + (b.unrealised_gain || 0),
 
 0
 
 )
 
-const totalPortfolio =
+const totalPortfolio = list.reduce(
 
-list.reduce(
-
-(a,b)=>a+(b.portfolio_pct || 0),
+(a,b)=>a + (b.portfolio_pct || 0),
 
 0
 
 )
 
-const totalMarketSGD =
+const totalMarketSGD = list.reduce(
 
-list.reduce(
-
-(a,b)=>a+(b.value_sgd || 0),
+(a,b)=>a + (b.value_sgd || 0),
 
 0
 
 )
 
-const totalInvestmentSGD =
+const totalInvestmentSGD = list.reduce(
 
-list.reduce(
-
-(a,b)=>a+(b.investment_sgd || 0),
+(a,b)=>a + (b.investment_sgd || 0),
 
 0
 
 )
 
-const totalGainSGD =
+const totalGainSGD = list.reduce(
 
-list.reduce(
-
-(a,b)=>a+(b.profit_sgd || 0),
-
-0
-
-)
-
-const totalInvestment=
-
-list.reduce(
-
-(a,b)=>a+b.investment_value,
-
-0
-
-)
-
-const totalGain=
-
-list.reduce(
-
-(a,b)=>a+b.unrealised_gain,
-
-0
-
-)
-
-const totalPortfolio=
-
-list.reduce(
-
-(a,b)=>a+b.portfolio_pct,
-
-0
-
-)
-
-const totalMarketSGD=
-
-list.reduce(
-
-(a,b)=>a+b.value_sgd,
-
-0
-
-)
-
-const totalInvestmentSGD=
-
-list.reduce(
-
-(a,b)=>a+b.investment_sgd,
-
-0
-
-)
-
-const totalGainSGD=
-
-list.reduce(
-
-(a,b)=>a+b.profit_sgd,
-
-0
-
-)
-
-const totalProfit=
-
-list.reduce(
-
-(a,b)=>a+b.profit_sgd,
+(a,b)=>a + (b.profit_sgd || 0),
 
 0
 
@@ -684,17 +596,7 @@ list.reduce(
 
 return(
 
-<div
-
-key={currency}
-
-style={{
-
-marginBottom:"40px"
-
-}}
-
->
+<div key={currency}>
 
 <h3>
 
