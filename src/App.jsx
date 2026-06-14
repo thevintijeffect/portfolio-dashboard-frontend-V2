@@ -164,7 +164,15 @@ String(selected).trim()
 :
 
 []
+console.log("Selected Asset:", selected)
 
+console.log("All Holdings:", portfolio.holdings)
+
+console.log("Filtered Holdings:",
+  portfolio.holdings?.filter(
+    x => x.sub_type === selected
+  )
+)
 const grouped = {}
 
 if(Array.isArray(holdings)){
@@ -531,65 +539,52 @@ marginTop:"30px"
 </h2>
 
 {
-
 Object.entries(grouped).map(
-
 ([currency,list])=>{
 
-const totalMarket = list.reduce(
+console.log("Currency Group:", currency)
+console.log("Holdings in Group:", list)
 
-(a,b)=>a + (b.market_value || 0),
-
+const totalValue=
+list.reduce(
+(a,b)=>a+(Number(b.market_value)||0),
 0
-
 )
 
-const totalInvestment = list.reduce(
-
-(a,b)=>a + (b.investment_value || 0),
-
+const totalInv=
+list.reduce(
+(a,b)=>a+(Number(b.investment_value)||0),
 0
-
 )
 
-const totalGain = list.reduce(
-
-(a,b)=>a + (b.unrealised_gain || 0),
-
+const totalGain=
+list.reduce(
+(a,b)=>a+(Number(b.unrealised_gain)||0),
 0
-
 )
 
-const totalPortfolio = list.reduce(
-
-(a,b)=>a + (b.portfolio_pct || 0),
-
+const totalPortfolio=
+list.reduce(
+(a,b)=>a+(Number(b.portfolio_pct)||0),
 0
-
 )
 
-const totalMarketSGD = list.reduce(
-
-(a,b)=>a + (b.value_sgd || 0),
-
+const totalValueSGD=
+list.reduce(
+(a,b)=>a+(Number(b.value_sgd)||0),
 0
-
 )
 
-const totalInvestmentSGD = list.reduce(
-
-(a,b)=>a + (b.investment_sgd || 0),
-
+const totalInvSGD=
+list.reduce(
+(a,b)=>a+(Number(b.investment_sgd)||0),
 0
-
 )
 
-const totalGainSGD = list.reduce(
-
-(a,b)=>a + (b.profit_sgd || 0),
-
+const totalGainSGD=
+list.reduce(
+(a,b)=>a+(Number(b.profit_sgd)||0),
 0
-
 )
 
 return(
@@ -597,9 +592,7 @@ return(
 <div key={currency}>
 
 <h3>
-
-{currency} Holdings
-
+{currency}
 </h3>
 
 <table>
@@ -608,21 +601,21 @@ return(
 
 <tr>
 
-<th>Name</th>
+<th>Company</th>
 
 <th>Qty</th>
 
-<th>Price</th>
+<th>Current Price</th>
 
-<th>Market Value</th>
+<th>Current Market Value</th>
 
-<th>Investment</th>
+<th>Investment Value</th>
 
-<th>Gain</th>
+<th>Unrealised Gain</th>
 
-<th>Gain%</th>
+<th>Unrealised Gain %</th>
 
-<th>Portfolio%</th>
+<th>Portfolio %</th>
 
 </tr>
 
@@ -631,153 +624,114 @@ return(
 <tbody>
 
 {
+list.map((h,i)=>{
 
-list.map(
+console.log("Holding Row:", h)
 
-(h,i)=>(
+return(
 
 <tr key={i}>
 
 <td>
-
 {h.asset || "-"}
-
 </td>
 
 <td>
-
-{(h.qty ?? 0).toLocaleString()}
-
+{Number(h.qty || 0).toLocaleString()}
 </td>
 
 <td>
-
-{(h.current_price ?? 0).toLocaleString()}
-
+{Number(h.current_price || 0).toLocaleString()}
 </td>
 
 <td>
-
-{(h.market_value ?? 0).toLocaleString()}
-
+{Number(h.market_value || 0).toLocaleString()}
 </td>
 
 <td>
-
-{(h.investment_value ?? 0).toLocaleString()}
-
+{Number(h.investment_value || 0).toLocaleString()}
 </td>
 
 <td>
-
-{(h.unrealised_gain ?? 0).toLocaleString()}
-
+{Number(h.unrealised_gain || 0).toLocaleString()}
 </td>
 
 <td>
-
-{(h.unrealised_gain_pct ?? 0).toFixed(2)}%
-
+{Number(h.unrealised_gain_pct || 0).toFixed(2)}%
 </td>
 
 <td>
-
-{(h.portfolio_pct ?? 0).toFixed(2)}%
-
+{Number(h.portfolio_pct || 0).toFixed(2)}%
 </td>
 
 </tr>
 
 )
 
-)
-
+})
 }
 
-<tr>
+<tr
+style={{
+fontWeight:"bold",
+background:"#18222f"
+}}
+>
+
+<td>TOTAL</td>
+
+<td></td>
+
+<td></td>
 
 <td>
-
-TOTAL
-
-</td>
-
-<td/>
-
-<td/>
-
-<td>
-
-{totalMarket.toLocaleString()}
-
-</td>
-
-<td>
-
-{totalInvestment.toLocaleString()}
-
+{totalValue.toLocaleString()}
 </td>
 
 <td>
+{totalInv.toLocaleString()}
+</td>
 
+<td>
 {totalGain.toLocaleString()}
-
 </td>
 
-<td/>
+<td></td>
 
 <td>
-
 {totalPortfolio.toFixed(2)}%
-
 </td>
 
 </tr>
 
+<tr
+style={{
+fontWeight:"bold",
+background:"#223041"
+}}
+>
 
-<tr>
+<td>TOTAL SGD</td>
+
+<td></td>
+
+<td></td>
 
 <td>
-
-TOTAL SGD
-
-</td>
-
-<td/>
-
-<td/>
-
-<td>
-
-S$
-
-{totalMarketSGD.toLocaleString()}
-
+S$ {totalValueSGD.toLocaleString()}
 </td>
 
 <td>
-
-S$
-
-{totalInvestmentSGD.toLocaleString()}
-
+S$ {totalInvSGD.toLocaleString()}
 </td>
 
 <td>
-
-S$
-
-{totalGainSGD.toLocaleString()}
-
+S$ {totalGainSGD.toLocaleString()}
 </td>
 
-<td/>
+<td></td>
 
-<td>
-
-{totalPortfolio.toFixed(2)}%
-
-</td>
+<td></td>
 
 </tr>
 
@@ -790,9 +744,7 @@ S$
 )
 
 }
-
 )
-
 }
 
 </div>
